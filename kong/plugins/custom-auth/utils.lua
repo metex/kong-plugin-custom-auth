@@ -35,6 +35,9 @@ function M.introspect_access_token(conf, access_token)
 
     M.injectUser(data)
 
+    -- Inject the header X-Userinfo in the upstream server request
+    kong.service.request.set_header(conf.user_info_header_name, cjson.encode(data))
+
     return true -- all is well
   end
 
