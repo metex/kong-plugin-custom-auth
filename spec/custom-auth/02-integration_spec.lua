@@ -1,7 +1,7 @@
 local helpers = require "spec.helpers"
 
 
-local PLUGIN_NAME = "myplugin"
+local PLUGIN_NAME = "custom-auth"
 
 
 for _, strategy in helpers.all_strategies() do
@@ -10,6 +10,11 @@ for _, strategy in helpers.all_strategies() do
 
     lazy_setup(function()
 
+      local CLIENT_ID = "skoiy-client"
+      local CLIENT_SECRET = "jlJBVW21q0wG1OrVrkj3Y5fsAeAIRDGz"
+      local INTROSPECTION_ENDPOINT = "https://keycloak.kamino.tk/realms/skoiy/protocol/openid-connect/token/introspect"
+      local AUTHORIZATION_ENDPOINT = "https://keycloak.kamino.tk/realms/skoiy/protocol/openid-connect/token"
+    
       local bp = helpers.get_db_utils(strategy == "off" and "postgres" or strategy, nil, { PLUGIN_NAME })
 
       -- Inject a test route. No need to create a service, there is a default
@@ -21,7 +26,12 @@ for _, strategy in helpers.all_strategies() do
       bp.plugins:insert {
         name = PLUGIN_NAME,
         route = { id = route1.id },
-        config = {},
+        config = {
+          client_id = CLIENT_ID,
+          client_secret = CLIENT_SECRET,
+          introspection_endpoint = INTROSPECTION_ENDPOINT,
+          authorization_endpoint = AUTHORIZATION_ENDPOINT
+        },
       }
 
       -- start kong
@@ -59,29 +69,22 @@ for _, strategy in helpers.all_strategies() do
           }
         })
         -- validate that the request succeeded, response status 200
-        assert.response(r).has.status(200)
-        -- now check the request (as echoed by mockbin) to have the header
-        local header_value = assert.request(r).has.header("hello-world")
-        -- validate the value of that header
-        assert.equal("this is on a request", header_value)
+        assert.response(r).has.status(401)
       end)
     end)
 
-
-
-    describe("response", function()
-      it("gets a 'bye-world' header", function()
+    describe("can introspect", function()
+      it("gets a valid response", function()
         local r = client:get("/request", {
           headers = {
-            host = "test1.com"
+            host = "test1.com",
+            Authorization = "Bearer xyz"
           }
         })
+
         -- validate that the request succeeded, response status 200
         assert.response(r).has.status(200)
-        -- now check the response to have the header
-        local header_value = assert.response(r).has.header("bye-world")
-        -- validate the value of that header
-        assert.equal("this is on the response", header_value)
+        assert.response(r).has.header("X-Userinfo")
       end)
     end)
 

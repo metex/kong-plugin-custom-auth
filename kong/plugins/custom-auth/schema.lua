@@ -1,7 +1,7 @@
 local typedefs = require "kong.db.schema.typedefs"
 
 
-local PLUGIN_NAME = "myplugin"
+local PLUGIN_NAME = "custom-auth"
 
 
 local schema = {
@@ -20,12 +20,30 @@ local schema = {
               default = "Hello-World" } },
           { response_header = typedefs.header_name {
               required = true,
-              default = "Bye-World" } },
+              default = "Version" } },
           { ttl = { -- self defined field
               type = "integer",
               default = 600,
               required = true,
               gt = 0, }}, -- adding a constraint for the value
+          { client_id = { -- self defined field
+              type = "string",              
+              required = true}},
+          { client_secret = { -- self defined field
+              type = "string",              
+              required = true}},
+          { introspection_endpoint = typedefs.url({ required = true }) },
+          { authorization_endpoint = typedefs.url({ required = true }) },
+          { token_header = typedefs.header_name { default = "Authorization", required = true }, },
+          { user_info_header_name = typedefs.header_name { default = "X-Userinfo", required = true }, },
+          { ssl_verify = { -- self defined field
+              type = "boolean",
+              default = false,
+              required = true}},
+          { timeout = { -- self defined field
+              type = "integer",
+              default = 3000,
+              required = true }}
         },
         entity_checks = {
           -- add some validation rules across fields
