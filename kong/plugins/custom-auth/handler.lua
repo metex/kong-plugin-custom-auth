@@ -81,8 +81,9 @@ function plugin:access(plugin_conf)
   -- local values = utils.split(request_path, "")
   -- local customer_id = values[3]
 
+  kong.log.debug("Before introspect")
   utils.introspect_access_token(plugin_conf, access_token)
-  ngx.log(ngx.DEBUG, "plugin:access")
+  kong.log.debug("After introspect")
   -- kong.service.clear_header(plugin_conf.token_header)
 end --]]
 
