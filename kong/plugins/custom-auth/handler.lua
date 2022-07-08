@@ -78,6 +78,7 @@ function plugin:access(plugin_conf)
 
   -- replace Bearer prefix
   access_token = access_token:sub(8,-1) -- drop "Bearer "
+  kong.log.debug("AccessToken" .. access_token)
   -- local request_path = kong.request.get_path()
   -- local values = utils.split(request_path, "")
   -- local customer_id = values[3]
