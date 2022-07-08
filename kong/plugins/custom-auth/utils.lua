@@ -6,6 +6,7 @@ function M.introspect_access_token(conf, access_token)
     local client_id = conf.client_id
     local client_secret = conf.client_secret
 
+    local body = "token=" .. access_token .. "&client_id=" .. client_id .. "&client_secret=" .. client_secret
     local httpc = http:new()
     -- step 1: validate the token
     local res, err = httpc:request_uri(conf.introspection_endpoint, {
@@ -15,7 +16,7 @@ function M.introspect_access_token(conf, access_token)
             ["Content-Type"] = "application/x-www-form-urlencoded",
             -- ["Authorization"] = "Bearer " .. access_token 
         },
-        body = "token=" .. access_token .. "&client_id=" .. client_id .. "&client_secret=" .. client_secret,
+        body = body,
     })
 
     kong.log.debug("ClientId " .. client_id)
