@@ -32,6 +32,9 @@ local schema = {
           { client_secret = { -- self defined field
               type = "string",              
               required = true}},
+          { auth_host = { -- self defined field
+              type = "string",              
+              required = true}},
           { introspection_endpoint = typedefs.url({ required = true }) },
           { authorization_endpoint = typedefs.url({ required = true }) },
           { token_header = typedefs.header_name { default = "Authorization", required = true }, },
