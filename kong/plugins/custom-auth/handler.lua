@@ -72,13 +72,12 @@ function plugin:access(plugin_conf)
   local access_token = kong.request.get_headers()[plugin_conf.token_header]
 
   if not access_token then
-      kong.log.debug("Before introspect")
       kong.response.exit(401)  --unauthorized
   end
 
   -- replace Bearer prefix
   access_token = access_token:sub(8,-1) -- drop "Bearer "
-  kong.log.debug("AccessToken" .. access_token)
+  kong.log.debug("AccessToken " .. access_token)
   -- local request_path = kong.request.get_path()
   -- local values = utils.split(request_path, "")
   -- local customer_id = values[3]

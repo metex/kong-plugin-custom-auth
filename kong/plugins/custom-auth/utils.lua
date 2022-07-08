@@ -28,14 +28,18 @@ function M.introspect_access_token(conf, access_token)
 
     -- step 2: decode the returned json and validate if the access token is active
     local data = cjson.decode(res.body)
+    kong.log.debug("Response ")
+    kong.log.inspect(data)
     local active = data["active"]
     if active == false then
+        kong.log.debug("NotActive ")
         return kong.response.exit(401)
     end
 
+    kong.log.debug("Inject ")
     M.injectUser(data)
 
-    
+    kong.log.debug("Injected ")
     -- Inject the header X-Userinfo in the upstream server request
     kong.service.request.set_header(conf.user_info_header_name, ngx.encode_base64(cjson.encode(data)))
 
