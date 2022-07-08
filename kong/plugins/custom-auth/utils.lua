@@ -13,7 +13,8 @@ function M.introspect_access_token(conf, access_token)
         ssl_verify = false,
         headers = {
             ["Content-Type"] = "application/x-www-form-urlencoded",
-            ["Authorization"] = "Bearer " .. access_token },
+            -- ["Authorization"] = "Bearer " .. access_token 
+        },
         body = "token=" .. access_token .. "&client_id=" .. client_id .. "&client_secret=" .. client_secret,
     })
 
