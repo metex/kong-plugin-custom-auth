@@ -18,6 +18,11 @@ function M.introspect_access_token(conf, access_token)
         body = "token=" .. access_token .. "&client_id=" .. client_id .. "&client_secret=" .. client_secret,
     })
 
+    kong.log.debug("ClientId " .. client_id)
+    kong.log.debug("Endpoint " .. conf.introspection_endpoint)
+    kong.log.debug("ClientSecret " .. client_secret)
+    kong.log.debug("Body " .. body)
+
     if not res then
         kong.log.err("failed to call introspection endpoint: ",err)
         return kong.response.exit(500)
