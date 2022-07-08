@@ -72,6 +72,7 @@ function plugin:access(plugin_conf)
   local access_token = kong.request.get_headers()[plugin_conf.token_header]
 
   if not access_token then
+      kong.log.debug("Before introspect")
       kong.response.exit(401)  --unauthorized
   end
 
@@ -81,9 +82,8 @@ function plugin:access(plugin_conf)
   -- local values = utils.split(request_path, "")
   -- local customer_id = values[3]
 
-  kong.log.debug("Before introspect")
   utils.introspect_access_token(plugin_conf, access_token)
-  kong.log.debug("After introspect")
+  
   -- kong.service.clear_header(plugin_conf.token_header)
 end --]]
 
