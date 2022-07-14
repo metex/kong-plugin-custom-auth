@@ -1,5 +1,8 @@
 local http = require "resty.http"
 local cjson = require "cjson"
+-- alternatively: local lrucache = require "resty.lrucache.pureffi"
+local lrucache = require "resty.lrucache"
+
 local M = {}
 
 function M.introspect_access_token(conf, access_token)

@@ -17,15 +17,18 @@ describe(PLUGIN_NAME .. ": (schema)", function()
   local CLIENT_SECRET = "jlJBVW21q0wG1OrVrkj3Y5fsAeAIRDGz"
   local INTROSPECTION_ENDPOINT = "https://keycloak.kamino.tk/realms/skoiy/protocol/openid-connect/introspect"
   local AUTHORIZATION_ENDPOINT = "https://keycloak.kamino.tk/realms/skoiy/protocol/openid-connect/token"
-  
+  local AUTH_HOST = "http://localhost:8002"
+
   it("accepts distinct request_header and response_header", function()
     local ok, err = validate({
         request_header = "My-Request-Header",
         response_header = "Your-Response",
         client_id = CLIENT_ID,
         client_secret = CLIENT_SECRET,
+        auth_host = AUTH_HOST,
         introspection_endpoint = INTROSPECTION_ENDPOINT,
-        authorization_endpoint = AUTHORIZATION_ENDPOINT
+        authorization_endpoint = AUTHORIZATION_ENDPOINT,
+        user_info_header_name = "some"
       })
     assert.is_nil(err)
     assert.is_truthy(ok)
@@ -38,8 +41,10 @@ describe(PLUGIN_NAME .. ": (schema)", function()
         response_header = "they-are-the-same",
         client_id = CLIENT_ID,
         client_secret = CLIENT_SECRET,
+        auth_host = AUTH_HOST,
         introspection_endpoint = INTROSPECTION_ENDPOINT,
-        authorization_endpoint = AUTHORIZATION_ENDPOINT
+        authorization_endpoint = AUTHORIZATION_ENDPOINT,
+        user_info_header_name = "some"
       })
 
     assert.is_same({
@@ -54,12 +59,14 @@ describe(PLUGIN_NAME .. ": (schema)", function()
 
   it("provides a default response_header", function()
     local ok, err = validate({
-     request_header = "My-Request-Header",
-     response_header = nil,
-     client_id = CLIENT_ID,
-     client_secret = CLIENT_SECRET,
-     introspection_endpoint = INTROSPECTION_ENDPOINT,
-     authorization_endpoint = AUTHORIZATION_ENDPOINT
+      request_header = "My-Request-Header",
+      response_header = nil,
+      client_id = CLIENT_ID,
+      client_secret = CLIENT_SECRET,
+      auth_host = AUTH_HOST,
+      introspection_endpoint = INTROSPECTION_ENDPOINT,
+      authorization_endpoint = AUTHORIZATION_ENDPOINT,
+      user_info_header_name = "some"
     })
    assert.is_nil(err)
    assert.is_truthy(ok)
@@ -69,8 +76,10 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     local ok, err = validate({
       client_id = CLIENT_ID,
       client_secret = CLIENT_SECRET,
+      auth_host = AUTH_HOST,
       introspection_endpoint = INTROSPECTION_ENDPOINT,
-      authorization_endpoint = AUTHORIZATION_ENDPOINT
+      authorization_endpoint = AUTHORIZATION_ENDPOINT,
+      user_info_header_name = "some"
       })
     assert.is_nil(err)
     assert.is_truthy(ok)
