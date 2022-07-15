@@ -64,7 +64,14 @@ end --]]
 
 -- runs in the 'access_by_lua_block'
 function plugin:access(plugin_conf)
-  
+  local request_path = kong.request.get_path()
+  local oidcConfig = utils.get_options(plugin_conf, ngx)
+  local realm = "master"
+
+  -- execute the OAuth2 /token login flow
+  if request_path == "/realms/".. realm .. "/protocol/openid-connect/token" then    
+    utils.handle(plugin_conf)
+  end
   -- your custom code here
   kong.log.inspect(plugin_conf)   -- check the logs for a pretty-printed config!
   kong.service.request.set_header(plugin_conf.request_header, "this is on a request")

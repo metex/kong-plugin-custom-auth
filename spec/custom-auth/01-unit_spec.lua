@@ -23,6 +23,7 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     local ok, err = validate({
         request_header = "My-Request-Header",
         response_header = "Your-Response",
+        realm = "master",
         client_id = CLIENT_ID,
         client_secret = CLIENT_SECRET,
         auth_host = AUTH_HOST,
@@ -39,6 +40,7 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     local ok, err = validate({
         request_header = "they-are-the-same",
         response_header = "they-are-the-same",
+        realm = "master",
         client_id = CLIENT_ID,
         client_secret = CLIENT_SECRET,
         auth_host = AUTH_HOST,
@@ -61,6 +63,7 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     local ok, err = validate({
       request_header = "My-Request-Header",
       response_header = nil,
+      realm = "master",
       client_id = CLIENT_ID,
       client_secret = CLIENT_SECRET,
       auth_host = AUTH_HOST,

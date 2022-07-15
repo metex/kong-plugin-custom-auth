@@ -1,0 +1,20 @@
+version: '3.5'
+
+services:
+  pongo-internal-auth-api:
+    image: metalfarmer/internal-auth-api
+    container_name: pongo-internal-auth-api
+    restart: unless-stopped
+    ports:
+      - 5001:5000
+    environment:
+      - MYSQL_HOST=internal-auth-api-storage
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=users
+    links:
+      - pongo-internal-auth-api-storage:pongo-internal-auth-api-storage
+    depends_on:
+      - pongo-internal-auth-api-storage
+    stop_signal: SIGKILL
+    networks:
+      - ${NETWORK_NAME}

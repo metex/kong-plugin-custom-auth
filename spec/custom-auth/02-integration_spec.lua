@@ -1,5 +1,5 @@
 local helpers = require "spec.helpers"
-
+local cjson = require "cjson"
 
 local PLUGIN_NAME = "custom-auth"
 
@@ -10,11 +10,12 @@ for _, strategy in helpers.all_strategies() do
 
     lazy_setup(function()
 
+      local REALM = "master"
       local CLIENT_ID = "skoiy-client"
-      local CLIENT_SECRET = "2XMkoi2FVOtHjA7FUWcqGfEaqhMPMy91"
-      local INTROSPECTION_ENDPOINT = "http://localhost:8000/realms/Skoiy/protocol/openid-connect/token/introspect"
-      local AUTHORIZATION_ENDPOINT = "http://localhost:8000/realms/Skoiy/protocol/openid-connect/token"
-      local AUTH_HOST = "http://localhost:8001"
+      local CLIENT_SECRET = "mA2zmkI6ur1JKEzNVhSBJp1QCtde6Bxm"
+      local INTROSPECTION_ENDPOINT = "http://localhost:8000/realms/".. REALM .."/protocol/openid-connect/token/introspect"
+      local AUTHORIZATION_ENDPOINT = "http://pongo-keycloak:8080/realms/".. REALM .."/protocol/openid-connect/token"
+      local AUTH_HOST = "auth.kong.com"
 
       local bp = helpers.get_db_utils(strategy == "off" and "postgres" or strategy, nil, { PLUGIN_NAME })
 
@@ -23,10 +24,40 @@ for _, strategy in helpers.all_strategies() do
       local route1 = bp.routes:insert({
         hosts = { "test1.com" },
       })
+      
+      local route2 = bp.routes:insert({
+        paths = { "/realms/".. REALM .."/protocol/openid-connect/token" },
+        hosts = { "auth.kong.com" },
+      })
+
+      local service7 = bp.services:insert{
+        protocol = "http",
+        port     = 8080,
+        host     = "pongo-keycloak",
+      }
+
+      local route7 = bp.routes:insert {
+        paths = { "/realms/".. REALM .."/protocol/openid-connect/token" },
+        hosts = { "auth.kong.com" },
+        strip_path = false,
+      }
+
       -- add the plugin to test to the route we created
       bp.plugins:insert {
         name = PLUGIN_NAME,
-        route = { id = route1.id },
+        route = { id = route1.id, },
+        config = {
+          client_id = CLIENT_ID,
+          client_secret = CLIENT_SECRET,
+          auth_host = AUTH_HOST,
+          introspection_endpoint = INTROSPECTION_ENDPOINT,
+          authorization_endpoint = AUTHORIZATION_ENDPOINT
+        },
+      }
+
+      bp.plugins:insert {
+        name = PLUGIN_NAME,
+        route = { id = route7.id, },
         config = {
           client_id = CLIENT_ID,
           client_secret = CLIENT_SECRET,
@@ -61,8 +92,7 @@ for _, strategy in helpers.all_strategies() do
       if client then client:close() end
     end)
 
-
-
+    --[[
     describe("request", function()
       it("gets a 'hello-world' header", function()
         local r = client:get("/request", {
@@ -74,7 +104,33 @@ for _, strategy in helpers.all_strategies() do
         assert.response(r).has.status(401)
       end)
     end)
+    --]]
 
+    describe("request", function ()
+      it("can get an access token from ", function()
+        local r = client:post("/realms/master/protocol/openid-connect/token", {
+          body = {
+            username = "admin",
+            password = "admin"
+          },
+          headers = {
+            ["Content-Type"] = "application/x-www-form-urlencoded",
+            ["Host"] = "auth.kong.com"
+          }
+        })
+        
+        assert.response(r).has.header("Content-Type")
+        -- assert.response(r).has.header("X-IdTenant")
+        assert.response(r).has.status(200)
+        assert.is_truthy(true)
+        local body = assert.res_status(200, r)        
+        local json = cjson.decode(body)
+        -- local json_table = assert.response(res).has.jsonbody()
+        local access_token = json["access_token"]
+        -- print(access_token)
+      end)
+    end)    
+    
     --[[
     describe("can introspect", function()
       it("gets a valid response", function()

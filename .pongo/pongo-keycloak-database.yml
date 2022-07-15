@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  pongo-keycloak-database:
+    container_name: pongo-keycloak-database
+    command:
+      - "postgres"
+      - "-c"
+      - "config_file=/etc/postgresql/postgresql.conf"
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+    image: postgres:10
+    ports:
+      - 5433:5433
+    volumes:
+      - ./conf/postgresql-10/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./storage/postgres-10:/var/lib/postgresql/data
+    stop_signal: SIGKILL
+    networks:
+      - ${NETWORK_NAME}

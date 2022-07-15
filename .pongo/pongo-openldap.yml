@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  pongo-openldap:
+    image: osixia/openldap:1.3.0
+    container_name: pongo-openldap
+    ports:
+      - 8389:389
+    stop_signal: SIGKILL
+    networks:
+      - ${NETWORK_NAME}
